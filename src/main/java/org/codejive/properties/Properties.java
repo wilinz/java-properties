@@ -620,10 +620,7 @@ public class Properties extends AbstractMap<String, String> {
         for (int i = 0; i < raw.length(); i++) {
             char c = raw.charAt(i);
             if (c > 0x7F) { //Escape non-ascii characters
-                String hex = Integer.toHexString(c);
-                if (hex.length() < 4) {
-                    hex = String.format("%4s", hex).replace(" ", "0");
-                }
+                String hex = String.format("%04x", (int) c);
                 builder.append("\\u").append(hex);
             } else {
                 builder.append(c);

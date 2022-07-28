@@ -2,6 +2,8 @@
 
 [![Release](https://jitpack.io/v/wilinz/java-properties.svg)](https://jitpack.io/#wilinz/java-properties)
 
+This project is modified from https://github.com/codejive/java-properties
+
 Java Properties is a drop-in replacement of the ubiquitous
 [`java.util.Properties`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Properties.html)
 that everybody knows and loves (hates?).

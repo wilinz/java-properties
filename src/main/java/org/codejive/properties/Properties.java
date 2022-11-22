@@ -915,10 +915,11 @@ public class Properties extends AbstractMap<String, String> {
         Cursor pos = first();
         if (comment.length > 0) {
             pos = skipHeaderCommentLines();
+            String nl = determineNewline();
             List<String> newcs = normalizeComments(Arrays.asList(comment), "# ");
             for (String c : newcs) {
                 String commentText = new PropertiesParser.Token(PropertiesParser.Type.COMMENT, c).getRaw();
-                String property = PropertiesParser.Token.EOL.getRaw();
+                String property = nl;
                 if (isEncodeUnicode) {
                     commentText = encodeUnicode(commentText);
                     property = encodeUnicode(property);
@@ -930,7 +931,7 @@ public class Properties extends AbstractMap<String, String> {
             }
             // We write an extra empty line so this comment won't be taken as part of the first
             // property
-            String property = PropertiesParser.Token.EOL.getRaw();
+            String property = nl;
             if (isEncodeUnicode) {
                 property = encodeUnicode(property);
             }
@@ -941,6 +942,35 @@ public class Properties extends AbstractMap<String, String> {
             writer.write(isEncodeUnicode ? encodeUnicode(pos.raw()) : pos.raw());
             writer.flush();
             pos.next();
+        }
+    }
+
+    /**
+     * This method determines the newline string to use when generating line terminators. It looks
+     * at all existing line terminators and will use those for any new lines. In case of ambiguity
+     * (a file contains both LF and CRLF terminators) it will return the system's default line
+     * ending.
+     *
+     * @return A string containing the line ending to use
+     */
+    private String determineNewline() {
+        boolean lf = false;
+        boolean crlf = false;
+        for (PropertiesParser.Token token : tokens) {
+            if (token.isWs()) {
+                if (token.raw.endsWith("/r/n")) {
+                    crlf = true;
+                } else if (token.raw.endsWith("/n")) {
+                    lf = true;
+                }
+            }
+        }
+        if (lf && crlf) {
+            return System.lineSeparator();
+        } else if (crlf) {
+            return "/r/n";
+        } else {
+            return "\n";
         }
     }
 
